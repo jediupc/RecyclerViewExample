@@ -29,8 +29,8 @@ public class MainActivity extends ActionBarActivity {
         mRecyclerView.setLayoutManager(mLinearLayout);
 
 
-        //El adapter se encarga de  adaptar un objeto definido en el código a una vista en xml
-        //según la estructura definida.
+        //El adapter se encarga de  adaptar un objeto definido en el cï¿½digo a una vista en xml
+        //segï¿½n la estructura definida.
         //Asignamos nuestro custom Adapter
         mRecyclerView.setAdapter(new MyCustomAdapter());
     }
