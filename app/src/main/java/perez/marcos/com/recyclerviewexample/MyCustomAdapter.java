@@ -1,44 +1,30 @@
 package perez.marcos.com.recyclerviewexample;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
-
+import java.util.List;
 
 
 public class MyCustomAdapter extends RecyclerView.Adapter<MyCustomAdapter.AdapterViewHolder>{
 
-    ArrayList<Contact> contactos;
-
-    MyCustomAdapter(){
-        contactos = new ArrayList<>();
-        contactos.add(new Contact(0,"Benito Camela","123456789"));
-        contactos.add(new Contact(0,"Alberto Carlos Huevos","123456789"));
-        contactos.add(new Contact(1,"Lola Mento","123456789"));
-        contactos.add(new Contact(0,"Aitor Tilla","123456789"));
-        contactos.add(new Contact(0,"Elvis Teck","123456789"));
-        contactos.add(new Contact(1,"Débora Dora","123456789"));
-        contactos.add(new Contact(0,"Borja Món de York","123456789"));
-        contactos.add(new Contact(1,"Encarna Vales","123456789"));
-        contactos.add(new Contact(0,"Enrique Cido","123456789"));
-        contactos.add(new Contact(0,"Francisco Jones","123456789"));
-        contactos.add(new Contact(1,"Estela Gartija","123456789"));
-        contactos.add(new Contact(0,"Andrés Trozado","123456789"));
-        contactos.add(new Contact(0,"Carmelo Cotón","123456789"));
-        contactos.add(new Contact(0,"Alberto Mate","123456789"));
-        contactos.add(new Contact(0,"Chema Pamundi","123456789"));
-        contactos.add(new Contact(0,"Armando Adistancia","123456789"));
-        contactos.add(new Contact(1,"Helena Nito Del Bosque","123456789"));
-        contactos.add(new Contact(0,"Unai Nomás","123456789"));
-        contactos.add(new Contact(1,"Ester Colero","123456789"));
-        contactos.add(new Contact(0,"Marcos Corrón","123456789"));
+    List<Contact> contactos;
+    Context context;
+    MyCustomAdapter(Context c, List<Contact> contacts){
+        this.context = c;
+        this.contactos = contacts;
     }
 
+    public interface OnIconTouched {
+        void meHanPulsado(int position, Contact contactoPulsado);
+    }
 
     @Override
     public MyCustomAdapter.AdapterViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
@@ -50,8 +36,10 @@ public class MyCustomAdapter extends RecyclerView.Adapter<MyCustomAdapter.Adapte
     }
 
     @Override
-    public void onBindViewHolder(MyCustomAdapter.AdapterViewHolder adapterViewholder, int position) {
-        int iconLayout = contactos.get(position).getIcon();
+    public void onBindViewHolder(MyCustomAdapter.AdapterViewHolder adapterViewholder, final int position) {
+        final Contact contactoAMostrar = contactos.get(position);
+
+        int iconLayout = contactoAMostrar.getIcon();
         //Dependiendo del entero se asignará una imagen u otra
         switch (iconLayout){
             case 0:
@@ -63,8 +51,24 @@ public class MyCustomAdapter extends RecyclerView.Adapter<MyCustomAdapter.Adapte
                 adapterViewholder.icon.setImageDrawable(adapterViewholder.v.getResources().getDrawable(R.drawable.icon1));
                 break;
         }
-        adapterViewholder.name.setText(contactos.get(position).getName());
-        adapterViewholder.phone.setText(contactos.get(position).getPhone());
+        adapterViewholder.name.setText(contactoAMostrar.getName());
+        adapterViewholder.phone.setText(contactoAMostrar.getPhone());
+        adapterViewholder.phone.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                contactos.remove(position);
+                notifyItemRemoved(position);
+//                notifyDataSetChanged();
+            }
+        });
+
+        adapterViewholder.icon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(context,"HAN PULSADO EL ICONO", Toast.LENGTH_SHORT).show();
+                ((OnIconTouched) context).meHanPulsado(position, contactoAMostrar);
+            }
+        });
 
     }
 
@@ -75,6 +79,10 @@ public class MyCustomAdapter extends RecyclerView.Adapter<MyCustomAdapter.Adapte
         return contactos.size();
     }
 
+    public void addContacts(List<Contact> contactos) {
+        this.contactos.addAll(contactos);
+        notifyDataSetChanged();
+    }
 
 
     //Definimos una clase viewholder que funciona como adapter para
